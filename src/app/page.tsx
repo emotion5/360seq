@@ -1,103 +1,78 @@
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
+
+const imageSequences = [
+  {
+    name: 'Drill',
+    path: '/drill',
+    thumbnail: '/drill-images/drill-01.jpg',
+    description: '36-frame drill spin with smooth rotation'
+  },
+  {
+    name: 'Adidas Sneakers',
+    path: '/adidas',
+    thumbnail: '/adidas-images/adidas-001.jpg',
+    description: '71-frame shoe spin with multi-angle view'
+  },
+  {
+    name: 'Jar',
+    path: '/jar00',
+    thumbnail: '/jar00/jar-001.jpeg',
+    description: '3-frame jar rotation with amber theme'
+  },
+  {
+    name: 'Box',
+    path: '/box00',
+    thumbnail: '/box00/box-001.jpeg',
+    description: '4-frame box rotation with blue theme'
+  }
+];
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 p-8">
+      <div className="max-w-6xl mx-auto text-center">
+        <h1 className="text-4xl font-bold text-slate-800 mb-4">
+          360° 제품 뷰어 갤러리
+        </h1>
+        <p className="text-lg text-slate-600 mb-12">
+          마우스 휠과 드래그로 조작할 수 있는 인터랙티브 360도 제품 뷰
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {imageSequences.map((sequence) => (
+            <Link 
+              key={sequence.name}
+              href={sequence.path}
+              className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+            >
+              <div className="relative aspect-square">
+                <Image
+                  src={sequence.thumbnail}
+                  alt={sequence.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-slate-800 mb-2 group-hover:text-blue-600">
+                  {sequence.name} 360°
+                </h2>
+                <p className="text-slate-600 mb-4">
+                  {sequence.description}
+                </p>
+                <div className="text-blue-600 font-medium">
+                  데모 보기 →
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="mt-12 text-slate-500 text-sm">
+          <p>조작법: 마우스 휠로 회전 • 클릭 드래그로 스핀</p>
+        </div>
+      </div>
     </div>
   );
 }
