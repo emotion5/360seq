@@ -1,32 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-
-const imageSequences = [
-  {
-    name: 'Drill',
-    path: '/drill',
-    thumbnail: '/drill-images/drill-01.jpg',
-    description: '36-frame drill spin with smooth rotation'
-  },
-  {
-    name: 'Adidas Sneakers',
-    path: '/adidas',
-    thumbnail: '/adidas-images/adidas-001.jpg',
-    description: '71-frame shoe spin with multi-angle view'
-  },
-  {
-    name: 'Jar',
-    path: '/jar00',
-    thumbnail: '/jar00/jar-001.jpeg',
-    description: '3-frame jar rotation with amber theme'
-  },
-  {
-    name: 'Box',
-    path: '/box00',
-    thumbnail: '/box00/box-001.jpeg',
-    description: '4-frame box rotation with blue theme'
-  }
-];
+import { productConfigs, getThumbnailSrc } from '@/config/products';
 
 export default function Home() {
   return (
@@ -40,26 +14,26 @@ export default function Home() {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {imageSequences.map((sequence) => (
+          {productConfigs.map((product) => (
             <Link 
-              key={sequence.name}
-              href={sequence.path}
+              key={product.name}
+              href={product.path}
               className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
               <div className="relative aspect-square">
                 <Image
-                  src={sequence.thumbnail}
-                  alt={sequence.name}
+                  src={getThumbnailSrc(product)}
+                  alt={product.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-slate-800 mb-2 group-hover:text-blue-600">
-                  {sequence.name} 360°
+                  {product.name} 360°
                 </h2>
                 <p className="text-slate-600 mb-4">
-                  {sequence.description}
+                  {product.description}
                 </p>
                 <div className="text-blue-600 font-medium">
                   데모 보기 →
