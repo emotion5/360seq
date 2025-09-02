@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 
 interface SpinViewerProps {
@@ -23,6 +23,8 @@ export default function SpinViewer({
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isTouching, setIsTouching] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(0);
+  const [isAllImagesLoaded, setIsAllImagesLoaded] = useState(false);
   const lastMouseX = useRef(0);
   const lastTouchX = useRef(0);
 
@@ -101,15 +103,63 @@ export default function SpinViewer({
     lastTouchX.current = touch.clientX;
   };
 
-  const getImageSrc = () => {
-    const frameNumber = currentFrame + 1;
+  const getImageSrc = useCallback((frame: number = currentFrame) => {
+    const frameNumber = frame + 1;
     const paddedFrameNumber = String(frameNumber).padStart(frameDigits, '0');
     return `${imagePath}${imagePrefix}-${paddedFrameNumber}.${imageExtension}`;
-  };
+  }, [imagePath, imagePrefix, imageExtension, frameDigits, currentFrame]);
+
+  // 이미지 프리로딩 useEffect
+  useEffect(() => {
+    const preloadImages = async () => {
+      let loadedCount = 0;
+      
+      for (let i = 0; i < totalFrames; i++) {
+        const img = new window.Image();
+        img.src = getImageSrc(i);
+        
+        img.onload = () => {
+          loadedCount++;
+          setImagesLoaded(loadedCount);
+          if (loadedCount === totalFrames) {
+            setIsAllImagesLoaded(true);
+          }
+        };
+        
+        img.onerror = () => {
+          loadedCount++;
+          setImagesLoaded(loadedCount);
+          if (loadedCount === totalFrames) {
+            setIsAllImagesLoaded(true);
+          }
+        };
+      }
+    };
+
+    preloadImages();
+  }, [totalFrames, imagePath, imagePrefix, imageExtension, frameDigits, getImageSrc]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="relative">
+      {!isAllImagesLoaded && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-10">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-600 mb-2">이미지 로딩 중...</p>
+            <div className="w-64 bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(imagesLoaded / totalFrames) * 100}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {imagesLoaded} / {totalFrames} 이미지 로드됨
+            </p>
+          </div>
+        </div>
+      )}
+      
+      <div className={`relative ${!isAllImagesLoaded ? 'opacity-20' : ''}`}>
         <div 
           className="cursor-grab active:cursor-grabbing select-none touch-none"
           onMouseDown={handleMouseDown}
@@ -128,6 +178,11 @@ export default function SpinViewer({
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
           Frame {currentFrame + 1} / {totalFrames}
         </div>
+        {isAllImagesLoaded && (
+          <div className="absolute top-4 right-4 bg-green-500 text-white px-2 py-1 rounded text-xs">
+            Ready
+          </div>
+        )}
       </div>
     </div>
   );
