@@ -22,7 +22,9 @@ export default function SpinViewer({
 }: SpinViewerProps) {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isTouching, setIsTouching] = useState(false);
   const lastMouseX = useRef(0);
+  const lastTouchX = useRef(0);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -42,6 +44,25 @@ export default function SpinViewer({
       setIsDragging(false);
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isTouching) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - lastTouchX.current;
+        const sensitivity = 5;
+        
+        if (Math.abs(deltaX) > sensitivity) {
+          const frameChange = deltaX > 0 ? 1 : -1;
+          setCurrentFrame(prev => (prev + frameChange + totalFrames) % totalFrames);
+          lastTouchX.current = touch.clientX;
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsTouching(false);
+    };
+
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       const frameChange = e.deltaY > 0 ? 1 : -1;
@@ -53,18 +74,31 @@ export default function SpinViewer({
       document.addEventListener('mouseup', handleMouseUp);
     }
 
+    if (isTouching) {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+
     document.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
       document.removeEventListener('wheel', handleWheel);
     };
-  }, [isDragging, totalFrames]);
+  }, [isDragging, isTouching, totalFrames]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     lastMouseX.current = e.clientX;
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsTouching(true);
+    const touch = e.touches[0];
+    lastTouchX.current = touch.clientX;
   };
 
   const getImageSrc = () => {
@@ -77,8 +111,9 @@ export default function SpinViewer({
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="relative">
         <div 
-          className="cursor-grab active:cursor-grabbing select-none"
+          className="cursor-grab active:cursor-grabbing select-none touch-none"
           onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
         >
           <Image
             src={getImageSrc()}
